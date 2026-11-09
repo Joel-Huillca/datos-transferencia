@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Datos para transferencia</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --ink: #111; --gray: #555; --line: #DDD; --soft: #F2F2F2; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", Arial, sans-serif;
+    background: #fff; color: var(--ink);
+    -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 0 20px 40px; }
+  .topbar { height: 8px; background: var(--ink); }
+  header { padding: 28px 0 20px; border-bottom: 1px solid var(--line); }
+  .title { font-size: 13px; font-weight: 700; letter-spacing: 3px; color: var(--gray); }
+  .help { margin-top: 8px; font-size: 15px; color: var(--gray); line-height: 1.4; }
+
+  .all {
+    width: 100%; margin: 20px 0 8px; padding: 18px; border: 0; border-radius: 14px;
+    background: var(--ink); color: #fff; font: inherit; font-size: 18px; font-weight: 700;
+    cursor: pointer;
+  }
+  .all:active { transform: scale(0.99); }
+
+  .row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 0; border-bottom: 1px solid var(--line);
+  }
+  .row.main { background: var(--soft); border: 0; border-radius: 14px; padding: 18px 16px; margin: 12px 0 4px; }
+  .info { flex: 1; min-width: 0; }
+  .label { font-size: 12px; font-weight: 700; letter-spacing: 2px; color: var(--gray); text-transform: uppercase; }
+  .value { margin-top: 4px; font-size: 20px; font-weight: 700; word-break: break-word; }
+  .row.main { flex-direction: column; align-items: stretch; gap: 14px; }
+  .row.main .value { font-size: 30px; font-weight: 800; letter-spacing: 0.5px; white-space: nowrap; }
+  .row.main .copy { width: 100%; padding: 14px; font-size: 17px; }
+  .copy {
+    flex: none; min-width: 92px; padding: 12px 14px; border: 2px solid var(--ink); border-radius: 10px;
+    background: #fff; color: var(--ink); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  .copy.ok, .all.ok { background: var(--ink); color: #fff; }
+  .all.ok { background: #333; }
+
+  .note { margin-top: 22px; font-size: 14px; color: var(--gray); line-height: 1.45; text-align: center; }
+  .note strong { color: var(--ink); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 999px;
+    font-size: 15px; font-weight: 600; white-space: nowrap; opacity: 0; transition: .2s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<div class="wrap">
+  <header>
+    <div class="title">DATOS PARA TRANSFERENCIA</div>
+    <p class="help">Toca <strong>Copiar</strong> y pega cada dato en la app de tu banco.</p>
+  </header>
+
+  <button class="all" id="all" type="button">Copiar todos los datos</button>
+
+  <div class="row">
+    <div class="info"><div class="label">Titular</div><div class="value">JOEL BRIAN HUILLCA QUISPE</div></div>
+    <button class="copy" type="button" data-copy="JOEL BRIAN HUILLCA QUISPE">Copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="info"><div class="label">RUT</div><div class="value">22.501.016-1</div></div>
+    <button class="copy" type="button" data-copy="22.501.016-1">Copiar</button>
+  </div>
+
+  <div class="row main">
+    <div class="info"><div class="label">Número de cuenta</div><div class="value">0 001 00 36429 8</div></div>
+    <button class="copy" type="button" data-copy="000100364298">Copiar número de cuenta</button>
+  </div>
+
+  <div class="row">
+    <div class="info"><div class="label">Banco</div><div class="value">BANCO SANTANDER</div></div>
+    <button class="copy" type="button" data-copy="BANCO SANTANDER">Copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="info"><div class="label">Tipo de cuenta</div><div class="value">CUENTA CORRIENTE</div></div>
+    <button class="copy" type="button" data-copy="CUENTA CORRIENTE">Copiar</button>
+  </div>
+
+  <div class="row">
+    <div class="info"><div class="label">Correo electrónico</div><div class="value">JOEL.HUILLCA.3@GMAIL.COM</div></div>
+    <button class="copy" type="button" data-copy="JOEL.HUILLCA.3@GMAIL.COM">Copiar</button>
+  </div>
+
+  <p class="note">Envía el comprobante a<br><strong>JOEL.HUILLCA.3@GMAIL.COM</strong></p>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  var ALL = [
+    "DATOS PARA TRANSFERENCIA",
+    "Titular: JOEL BRIAN HUILLCA QUISPE",
+    "RUT: 22.501.016-1",
+    "Banco: BANCO SANTANDER",
+    "Tipo de cuenta: CUENTA CORRIENTE",
+    "Número de cuenta: 0 001 00 36429 8",
+    "Correo: JOEL.HUILLCA.3@GMAIL.COM"
+  ].join("\n");
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.position = "fixed"; ta.style.top = "-1000px"; ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).then(function () { return true; },
+        function () { return fallbackCopy(text); });
+    }
+    return Promise.resolve(fallbackCopy(text));
+  }
+
+  var toastEl = document.getElementById("toast"), toastTimer;
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1800);
+  }
+
+  function flash(btn, okLabel, label) {
+    btn.textContent = okLabel; btn.classList.add("ok");
+    setTimeout(function () { btn.textContent = label; btn.classList.remove("ok"); }, 1800);
+  }
+
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.dataset.label = btn.textContent;
+    btn.addEventListener("click", function () {
+      copyText(btn.getAttribute("data-copy")).then(function (ok) {
+        if (ok) { flash(btn, "Copiado ✓", btn.dataset.label); toast("Copiado"); }
+        else { toast("No se pudo copiar. Mantén presionado el dato para copiarlo."); }
+      });
+    });
+  });
+
+  var allBtn = document.getElementById("all");
+  allBtn.addEventListener("click", function () {
+    copyText(ALL).then(function (ok) {
+      if (ok) { flash(allBtn, "Datos copiados ✓", "Copiar todos los datos"); toast("Todos los datos copiados"); }
+      else { toast("No se pudo copiar. Mantén presionado el dato para copiarlo."); }
+    });
+  });
+</script>
+</body>
+</html>
